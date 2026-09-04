@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saimoon's Private Flashcards</title>
+<style>
+  :root { --bg:#0f0f0f; --card:#1a1a1a; --accent:#7c5cff; --accent2:#00d1b2; --text:#fff; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+  
+  /* পাসওয়ার্ড এবং রিকোয়েস্ট স্ক্রিন */
+  #login-screen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+  .login-box { background: var(--card); padding: 40px 30px; border-radius: 20px; border: 1px solid #333; text-align: center; width: 90%; max-width: 380px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+  input { width: 100%; padding: 14px; margin: 20px 0 10px; border-radius: 12px; border: 1px solid #444; background: #222; color: #fff; text-align: center; font-size: 1rem; box-sizing: border-box; }
+  .btn-access { background: var(--accent); color: white; padding: 14px; border: none; border-radius: 12px; width: 100%; cursor: pointer; font-weight: bold; font-size: 1rem; margin-bottom: 20px; }
+  .mail-link { color: var(--accent2); text-decoration: none; font-size: 0.85rem; border: 1px solid var(--accent2); padding: 8px 15px; border-radius: 20px; display: inline-block; transition: 0.3s; }
+  .mail-link:hover { background: var(--accent2); color: #000; }
+
+  /* মেইন অ্যাপ স্ক্রিন */
+  #main-app { display: none; width: 100%; max-width: 600px; animation: fadeIn 0.4s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  header h1 { font-size: 1.6rem; text-align: center; margin-bottom: 20px; background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; color: transparent; font-weight: 800; }
+  
+  .flashcard { background: var(--card); border-radius: 25px; padding: 40px 25px; min-height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border: 1px solid #333; box-shadow: 0 15px 40px rgba(0,0,0,0.4); position: relative; }
+  
+  .bn { font-size: 1.4rem; font-weight: 600; line-height: 1.5; margin-bottom: 25px; }
+  .en { font-size: 1.25rem; color: var(--accent2); font-weight: 600; display: none; margin-bottom: 20px; }
+  
+  /* ব্যাখ্যা বক্স (Note) */
+  .note { font-size: 0.95rem; color: #ffcc00; background: rgba(255, 204, 0, 0.1); padding: 15px; border-radius: 12px; display: none; border-left: 5px solid #ffcc00; line-height: 1.6; text-align: left; width: 100%; box-sizing: border-box; }
+
+  .controls { display: flex; gap: 15px; margin-top: 25px; width: 100%; }
+  button.action-btn { flex: 1; padding: 18px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; font-size: 1rem; transition: transform 0.2s; }
+  button.action-btn:active { transform: scale(0.95); }
+  .btn-show { background: #2a2a2a; color: white; border: 1px solid #444; }
+  .btn-next { background: var(--accent); color: white; }
+</style>
+</head>
+<body>
+
+<!-- লগইন এবং রিকোয়েস্ট স্ক্রিন -->
+<div id="login-screen">
+  <div class="login-box">
+    <h2 style="margin:0;">🔒 Private Access</h2>
+    <p style="color:#777; font-size: 0.9rem; margin-top:10px;">প্রবেশ করতে পাসওয়ার্ড দিন।</p>
+    
+    <input type="password" id="passInput" placeholder="Password লিখুন...">
+    <button class="btn-access" onclick="login()">Access App</button>
+    
+    <p style="color:#555; font-size: 0.8rem; margin: 15px 0;">পাসওয়ার্ড না জানলে অনুমতি নিন:</p>
+    <a href="mailto:saimoon8528@gmail.com?subject=Access Request&body=হ্যালো সাইমুন, আমি আপনার ইংলিশ ফ্ল্যাশকার্ড অ্যাপটি ব্যবহার করতে চাই। দয়া করে আমাকে পাসওয়ার্ডটি দিন।" class="mail-link">📩 Request Access (Email)</a>
+  </div>
+</div>
+
+<!-- মেইন অ্যাপ স্ক্রিন -->
+<div id="main-app">
+  <header>
+    <h1>English Structure</h1>
+    <p style="text-align: center; color: #444; font-size: 0.7rem; margin:0;">Live Updated | Private Mode</p>
+  </header>
+
+  <div class="flashcard">
+    <div id="bn" class="bn">লোড হচ্ছে...</div>
+    <div style="width: 50px; height: 3px; background: var(--accent); border-radius: 5px; margin-bottom: 25px;"></div>
+    <div id="en" class="en"></div>
+    <div id="note" class="note"></div>
+  </div>
+
+  <div class="controls">
+    <button class="action-btn btn-show" id="showBtn">👁 Show Answer</button>
+    <button class="action-btn btn-next" id="nextBtn">Next ➜</button>
+  </div>
+  
+  <p style="text-align: center; color: #333; font-size: 0.8rem; margin-top: 30px;">Developed by Saimoon</p>
+</div>
+
+<script>
+// --- ১. পাসওয়ার্ড সেট ---
+const MASTER_PASS = "saimoon123"; 
+
+// --- ২. আপনার ডাটা (Live Update এর জন্য এখানে এডিট করবেন) ---
+const FLASHCARDS = [
+  {
+    "bn": "আমার পড়তে ইচ্ছা করছে।",
+    "en": "I feel like reading.",
+    "note": "রুল: Feel like + Verb(ing). <br>ব্যাখ্যা: বর্তমানে কোনো কিছু করার তীব্র ইচ্ছা বুঝালে এটি বসে।"
+  },
+  {
+    "bn": "তোমার কাজটি করা উচিত ছিল।",
+    "en": "You should have done the work.",
+    "note": "রুল: Should have + V3. <br>ব্যাখ্যা: অতীতে কোনো কাজ করা উচিত ছিল কিন্তু করা হয়নি—এমন আক্ষেপ বুঝাতে ব্যবহৃত হয়।"
+  }
+  // এভাবেই আপনার বাকি ১৩৩টি রুল কমা (,) দিয়ে দিয়ে নিচে বসিয়ে দিন।
+];
+
+let index = 0;
+
+// লগইন ফাংশন
+function login() {
+  const userPass = document.getElementById('passInput').value;
+  if(userPass === MASTER_PASS) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'block';
+    shuffleCards(); // ওপেন করার সময় কার্ডগুলো এলোমেলো হবে
+    render();
+  } else {
+    alert("ভুল পাসওয়ার্ড! অনুমতির জন্য নিচের বাটনে ক্লিক করে ইমেইল করুন।");
+  }
+}
+
+// কার্ড রেন্ডার ফাংশন
+function render() {
+  const item = FLASHCARDS[index];
+  document.getElementById('bn').innerHTML = item.bn;
+  document.getElementById('en').innerHTML = item.en;
+  document.getElementById('note').innerHTML = item.note || "এই রুলের ব্যাখ্যা এখনো যুক্ত করা হয়নি।";
+  
+  document.getElementById('en').style.display = 'none';
+  document.getElementById('note').style.display = 'none';
+  document.getElementById('showBtn').disabled = false;
+  document.getElementById('showBtn').innerText = "👁 Show Answer";
+}
+
+// উত্তর দেখার বাটন
+document.getElementById('showBtn').onclick = () => {
+  document.getElementById('en').style.display = 'block';
+  document.getElementById('note').style.display = 'block';
+  document.getElementById('showBtn').disabled = true;
+  document.getElementById('showBtn').innerText = "✔ Answer Shown";
+};
+
+// পরের কার্ডের বাটন
+document.getElementById('nextBtn').onclick = () => {
+  index = (index + 1) % FLASHCARDS.length;
+  render();
+};
+
+// কার্ডগুলো এলোমেলো করার জন্য
+function shuffleCards() {
+  FLASHCARDS.sort(() => Math.random() - 0.5);
+}
+</script>
+</body>
+</html>
